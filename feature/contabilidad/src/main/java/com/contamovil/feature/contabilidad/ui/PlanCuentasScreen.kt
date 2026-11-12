@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contamovil.core.database.entity.TipoCuenta
+import com.contamovil.feature.contabilidad.data.VarianteNomenclador
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,9 +40,17 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
     val cuentas by vm.cuentas.collectAsStateWithLifecycle()
     val error by vm.error.collectAsStateWithLifecycle()
     var mostrarDialogo by remember { mutableStateOf(false) }
+    var mostrarNomenclador by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Plan de cuentas") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Plan de cuentas") },
+                actions = {
+                    TextButton(onClick = { mostrarNomenclador = true }) { Text("Nomenclador") }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { vm.limpiarError(); mostrarDialogo = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Nueva cuenta")
@@ -50,7 +59,7 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
     ) { padding ->
         if (cuentas.isEmpty()) {
             Text(
-                "Aún no hay cuentas. Toca + para crear la primera.",
+                "Aún no hay cuentas. Toca \"Nomenclador\" arriba para cargar el nomenclador cubano, o + para crear una.",
                 modifier = Modifier.padding(padding).padding(16.dp)
             )
         } else {
@@ -81,6 +90,32 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
             }
         )
     }
+
+    if (mostrarNomenclador) {
+        AlertDialog(
+            onDismissRequest = { mostrarNomenclador = false },
+            title = { Text("Nomenclador de cuentas (Cuba)") },
+            text = {
+                Text(
+                    "Carga el nomenclador de la Resolución 494/2016 del MFP. " +
+                        "Elige el tipo de entidad: solo cambia el grupo 30 (patrimonio). " +
+                        "Si ya existen cuentas con el mismo código, no se tocan."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.cargarNomenclador(VarianteNomenclador.ESTATAL)
+                    mostrarNomenclador = false
+                }) { Text("Estatal") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    vm.cargarNomenclador(VarianteNomenclador.NO_ESTATAL)
+                    mostrarNomenclador = false
+                }) { Text("No estatal") }
+            }
+        )
+    }
 }
 
 @Composable
@@ -100,7 +135,7 @@ private fun NuevaCuentaDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = codigo, onValueChange = { codigo = it },
-                    label = { Text("Código (ej. 101 o 101.01)") }, singleLine = true
+                    label = { Text("Código (ej. 102 o 135.0010)") }, singleLine = true
                 )
                 OutlinedTextField(
                     value = nombre, onValueChange = { nombre = it },

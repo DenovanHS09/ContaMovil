@@ -18,6 +18,9 @@ interface CuentaDao {
     @Query("SELECT * FROM cuentas WHERE id = :id")
     suspend fun obtener(id: Long): CuentaEntity?
 
+    @Query("SELECT id FROM cuentas WHERE codigo = :codigo LIMIT 1")
+    suspend fun idPorCodigo(codigo: String): Long?
+
     /** Lanza SQLiteConstraintException si el código ya existe. */
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertar(cuenta: CuentaEntity): Long

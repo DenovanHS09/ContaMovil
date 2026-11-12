@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.core.database.entity.TipoCuenta
 import com.contamovil.feature.contabilidad.data.CuentaRepository
+import com.contamovil.feature.contabilidad.data.VarianteNomenclador
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,5 +49,9 @@ class PlanCuentasViewModel @Inject constructor(
                 _error.value = "No se puede eliminar: tiene subcuentas"
             }
         }
+    }
+
+    fun cargarNomenclador(variante: VarianteNomenclador) {
+        viewModelScope.launch { repo.cargarNomenclador(variante) }
     }
 }

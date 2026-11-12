@@ -18,6 +18,19 @@ android {
         versionName = "0.1.0"
     }
 
+    // Firma fija de depuración: todas las compilaciones llevan la misma firma,
+    // así Android permite instalar una versión encima de otra sin perder datos.
+    // (Solo para pruebas. Para publicar en Play Store se usará otra clave privada.)
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("contamovil-debug.p12")
+            storePassword = "android"
+            keyAlias = "contamovil"
+            keyPassword = "android"
+            storeType = "pkcs12"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

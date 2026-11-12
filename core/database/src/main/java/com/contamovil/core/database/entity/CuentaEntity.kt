@@ -5,14 +5,16 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-enum class Naturaleza { DEUDORA, ACREEDORA }
+enum class Naturaleza { DEUDORA, ACREEDORA, MIXTA }
 
 enum class TipoCuenta(val naturaleza: Naturaleza) {
     ACTIVO(Naturaleza.DEUDORA),
     PASIVO(Naturaleza.ACREEDORA),
     PATRIMONIO(Naturaleza.ACREEDORA),
     INGRESO(Naturaleza.ACREEDORA),
-    GASTO(Naturaleza.DEUDORA)
+    GASTO(Naturaleza.DEUDORA),
+    PRODUCCION(Naturaleza.DEUDORA),
+    CIERRE(Naturaleza.MIXTA)
 }
 
 /** Una cuenta del plan de cuentas contable. */
@@ -26,7 +28,7 @@ data class CuentaEntity(
     val nombre: String,
     val tipo: TipoCuenta,
     val naturaleza: Naturaleza = tipo.naturaleza,
-    /** 1 = cuenta mayor, 2 = subcuenta, etc. */
+    /** 1 = grupo, 2 = subgrupo, 3 = cuenta, 4 = subcuenta... */
     val nivel: Int = 1,
     val cuentaPadreId: Long? = null,
     /** Solo las cuentas "hoja" admiten movimientos en comprobantes. */
