@@ -37,4 +37,11 @@ interface CuentaDao {
     /** Cuántas líneas de comprobantes usan esta cuenta. */
     @Query("SELECT COUNT(*) FROM asientos WHERE cuentaId = :id")
     suspend fun contarMovimientos(id: Long): Int
+
+    @Query("SELECT * FROM cuentas WHERE cuentaPadreId = :id ORDER BY codigo")
+    suspend fun hijas(id: Long): List<CuentaEntity>
+
+    /** Cuentas cuyo nombre lleva la marca "[101-108]" pero aún no tienen guardado su rango. */
+    @Query("SELECT * FROM cuentas WHERE codigoHasta IS NULL AND nombre LIKE '%[%-%]'")
+    suspend fun sinRangoConMarca(): List<CuentaEntity>
 }

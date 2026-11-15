@@ -275,7 +275,8 @@ private fun LineaEditor(
 internal fun SelectorCuentaDialog(
     cuentas: List<CuentaEntity>,
     onElegir: (CuentaEntity) -> Unit,
-    onCerrar: () -> Unit
+    onCerrar: () -> Unit,
+    titulo: String = "Elegir cuenta"
 ) {
     var busqueda by remember { mutableStateOf("") }
     val filtradas = remember(busqueda, cuentas) {
@@ -288,7 +289,7 @@ internal fun SelectorCuentaDialog(
 
     AlertDialog(
         onDismissRequest = onCerrar,
-        title = { Text("Elegir cuenta") },
+        title = { Text(titulo) },
         text = {
             Column {
                 OutlinedTextField(

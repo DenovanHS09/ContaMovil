@@ -24,7 +24,8 @@ data class CuentaBase(
     val nombre: String,
     val tipo: TipoCuenta,
     val naturaleza: Naturaleza,
-    val padre: String? = null
+    val padre: String? = null,
+    val hasta: String? = null
 )
 
 private class Sub(val codigo: String, val nombre: String, val nat: Naturaleza? = null)
@@ -99,7 +100,7 @@ private class Constructor {
         subs: List<Sub> = emptyList()
     ) {
         val nom = if (hasta != null) "$nombre [$cod-$hasta]" else nombre
-        lista += CuentaBase(cod, nom, tipo, nat, subgrupoActual)
+        lista += CuentaBase(cod, nom, tipo, nat, subgrupoActual, hasta)
         subs.forEach {
             lista += CuentaBase("$cod.${it.codigo}", it.nombre, tipo, it.nat ?: nat, cod)
         }

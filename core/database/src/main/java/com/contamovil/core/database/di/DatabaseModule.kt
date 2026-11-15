@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.contamovil.core.database.AppDatabase
 import com.contamovil.core.database.MIGRACION_1_2
+import com.contamovil.core.database.MIGRACION_2_3
 import com.contamovil.core.database.dao.ComprobanteDao
 import com.contamovil.core.database.dao.CuentaDao
 import com.contamovil.core.database.dao.InformeDao
@@ -22,7 +23,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NOMBRE)
-            .addMigrations(MIGRACION_1_2)
+            .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
             // TODO: añadir SQLCipher (SupportFactory) para cifrar la base de datos
             .build()
 

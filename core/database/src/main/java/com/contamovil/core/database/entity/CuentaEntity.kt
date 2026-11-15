@@ -33,5 +33,7 @@ data class CuentaEntity(
     val cuentaPadreId: Long? = null,
     /** Solo las cuentas "hoja" admiten movimientos en comprobantes. */
     @ColumnInfo(defaultValue = "1") val aceptaMovimientos: Boolean = true,
-    @ColumnInfo(defaultValue = "1") val activa: Boolean = true
+    @ColumnInfo(defaultValue = "1") val activa: Boolean = true,
+    /** Último código del rango del nomenclador (ej. "108" para "101 a 108"); null si es un código único. */
+    val codigoHasta: String? = null
 )

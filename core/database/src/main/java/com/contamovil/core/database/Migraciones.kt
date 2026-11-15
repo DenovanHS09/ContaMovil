@@ -41,3 +41,10 @@ val MIGRACION_1_2 = object : Migration(1, 2) {
         )
     }
 }
+
+/** v2 -> v3: guarda el rango de cada cuenta del nomenclador (columna opcional). */
+val MIGRACION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `cuentas` ADD COLUMN `codigoHasta` TEXT")
+    }
+}
