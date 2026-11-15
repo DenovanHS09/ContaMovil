@@ -45,9 +45,7 @@ class PlanCuentasViewModel @Inject constructor(
 
     fun eliminar(cuenta: CuentaEntity) {
         viewModelScope.launch {
-            if (!repo.eliminar(cuenta)) {
-                _error.value = "No se puede eliminar: tiene subcuentas"
-            }
+            repo.eliminar(cuenta)?.let { _error.value = it }
         }
     }
 

@@ -91,6 +91,15 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
         )
     }
 
+    val mensaje = error
+    if (mensaje != null && !mostrarDialogo) {
+        AlertDialog(
+            onDismissRequest = { vm.limpiarError() },
+            text = { Text(mensaje) },
+            confirmButton = { TextButton(onClick = { vm.limpiarError() }) { Text("Entendido") } }
+        )
+    }
+
     if (mostrarNomenclador) {
         AlertDialog(
             onDismissRequest = { mostrarNomenclador = false },

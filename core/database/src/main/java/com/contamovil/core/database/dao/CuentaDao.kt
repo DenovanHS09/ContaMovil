@@ -33,4 +33,8 @@ interface CuentaDao {
 
     @Query("SELECT COUNT(*) FROM cuentas WHERE cuentaPadreId = :id")
     suspend fun contarHijas(id: Long): Int
+
+    /** Cuántas líneas de comprobantes usan esta cuenta. */
+    @Query("SELECT COUNT(*) FROM asientos WHERE cuentaId = :id")
+    suspend fun contarMovimientos(id: Long): Int
 }

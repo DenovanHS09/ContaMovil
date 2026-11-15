@@ -3,6 +3,8 @@ package com.contamovil.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.contamovil.core.database.AppDatabase
+import com.contamovil.core.database.MIGRACION_1_2
+import com.contamovil.core.database.dao.ComprobanteDao
 import com.contamovil.core.database.dao.CuentaDao
 import dagger.Module
 import dagger.Provides
@@ -19,9 +21,13 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NOMBRE)
+            .addMigrations(MIGRACION_1_2)
             // TODO: añadir SQLCipher (SupportFactory) para cifrar la base de datos
             .build()
 
     @Provides
     fun provideCuentaDao(db: AppDatabase): CuentaDao = db.cuentaDao()
+
+    @Provides
+    fun provideComprobanteDao(db: AppDatabase): ComprobanteDao = db.comprobanteDao()
 }

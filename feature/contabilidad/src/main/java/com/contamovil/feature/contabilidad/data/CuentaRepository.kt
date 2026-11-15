@@ -41,10 +41,14 @@ class CuentaRepository @Inject constructor(
         }
     }
 
-    suspend fun eliminar(cuenta: CuentaEntity): Boolean {
-        if (dao.contarHijas(cuenta.id) > 0) return false
+    /** Devuelve null si se eliminó, o el motivo por el que no se pudo. */
+    suspend fun eliminar(cuenta: CuentaEntity): String? {
+        if (dao.contarHijas(cuenta.id) > 0) return "No se puede eliminar: tiene subcuentas"
+        if (dao.contarMovimientos(cuenta.id) > 0) {
+            return "No se puede eliminar: tiene movimientos en comprobantes"
+        }
         dao.eliminar(cuenta)
-        return true
+        return null
     }
 
     /**
