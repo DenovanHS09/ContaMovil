@@ -6,6 +6,7 @@ import com.contamovil.core.database.AppDatabase
 import com.contamovil.core.database.MIGRACION_1_2
 import com.contamovil.core.database.dao.ComprobanteDao
 import com.contamovil.core.database.dao.CuentaDao
+import com.contamovil.core.database.dao.InformeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +31,7 @@ object DatabaseModule {
 
     @Provides
     fun provideComprobanteDao(db: AppDatabase): ComprobanteDao = db.comprobanteDao()
+
+    @Provides
+    fun provideInformeDao(db: AppDatabase): InformeDao = db.informeDao()
 }

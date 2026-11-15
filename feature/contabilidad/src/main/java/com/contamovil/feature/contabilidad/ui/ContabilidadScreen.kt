@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
@@ -21,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 
-/** Pantalla principal del módulo: pestañas Cuentas y Comprobantes. */
+/** Pantalla principal del módulo: pestañas Cuentas, Comprobantes e Informes. */
 @Composable
 fun ContabilidadScreen(vm: ComprobantesViewModel = hiltViewModel()) {
     var pestana by rememberSaveable { mutableIntStateOf(0) }
@@ -47,14 +48,20 @@ fun ContabilidadScreen(vm: ComprobantesViewModel = hiltViewModel()) {
                         icon = { Icon(Icons.Default.Edit, contentDescription = null) },
                         label = { Text("Comprobantes") }
                     )
+                    NavigationBarItem(
+                        selected = pestana == 2,
+                        onClick = { pestana = 2 },
+                        icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
+                        label = { Text("Informes") }
+                    )
                 }
             }
         ) { padding ->
             Box(Modifier.padding(padding)) {
-                if (pestana == 0) {
-                    PlanCuentasScreen()
-                } else {
-                    ComprobantesScreen(vm = vm, onNuevo = { vm.nuevo(); creando = true })
+                when (pestana) {
+                    0 -> PlanCuentasScreen()
+                    1 -> ComprobantesScreen(vm = vm, onNuevo = { vm.nuevo(); creando = true })
+                    else -> InformesScreen()
                 }
             }
         }

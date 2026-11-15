@@ -272,7 +272,7 @@ private fun LineaEditor(
 }
 
 @Composable
-private fun SelectorCuentaDialog(
+internal fun SelectorCuentaDialog(
     cuentas: List<CuentaEntity>,
     onElegir: (CuentaEntity) -> Unit,
     onCerrar: () -> Unit

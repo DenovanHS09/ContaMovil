@@ -25,3 +25,10 @@ fun parseCentavos(texto: String): Long? {
 
 fun formatCentavos(centavos: Long): String =
     String.format(Locale.US, "%,d.%02d", centavos / 100, centavos % 100)
+
+/** Saldo con su naturaleza: "D" = deudor, "A" = acreedor. */
+fun formatSaldo(saldo: Long): String = when {
+    saldo > 0 -> formatCentavos(saldo) + " D"
+    saldo < 0 -> formatCentavos(-saldo) + " A"
+    else -> "0.00"
+}
