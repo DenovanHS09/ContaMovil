@@ -1,98 +1,94 @@
 # ContaMovil
 
-Sistema de gestión contable, financiera y de inventario para **Android**, con base de datos local y soporte offline. Pensado para llevar al teléfono las funciones que normalmente se usan en un sistema de escritorio de gestión empresarial.
+Aplicación de contabilidad para **Android** que funciona **sin conexión**, con base de datos local y el **nomenclador de cuentas cubano**. Pensada para llevar al teléfono el registro contable básico: plan de cuentas, comprobantes con partida doble, libros e informes.
 
-> ⚠️ **Nota:** ContaMovil es un proyecto independiente. No contiene código, interfaz ni marca de ningún software comercial existente.
+> **Estado:** versión de pruebas (`v0.4`, pre-release). Úsala con cuidado y haz respaldos con frecuencia.
 
-## Estado del proyecto
+> **Aviso:** ContaMovil es un proyecto independiente. No contiene código, interfaz ni marca de ningún software comercial existente, y no sustituye el criterio de un contador. El nomenclador se basa en la Resolución 494/2016 del Ministerio de Finanzas y Precios, que puede haber sido modificada: **verifica siempre contra la versión vigente**.
 
-🚧 En desarrollo temprano (fase 0: estructura base).
+## Qué hace hoy
 
-## Características previstas
+- **Plan de cuentas** con el nomenclador cubano (entidades estatales y no estatales): grupos, subgrupos, cuentas y subcuentas obligatorias.
+  - Árbol plegable con buscador por código o nombre.
+  - Alta de cuentas con **sugerencia automática de cuenta madre** según el rango del nomenclador, y aviso si el código queda fuera de rango.
+- **Comprobantes de operaciones** con **partida doble**: no deja guardar si los débitos no igualan a los créditos. Importes en CUP, guardados en centavos.
+- **Libro diario**, **libro mayor** (con saldo anterior y saldo corriente) y **balance de comprobación**, por rango de fechas.
+- **Respaldo y restauración** de toda la base de datos mediante un archivo que guardas donde quieras (Drive, correo, memoria externa). La restauración valida el archivo y conserva una copia de los datos previos.
+- Base de datos con **migraciones**: las actualizaciones se instalan encima sin perder datos.
 
-- **Base de datos local** con Room (SQLite) y cifrado opcional (SQLCipher)
-- **Funcionamiento offline** con sincronización opcional a un servidor
-- **Usuarios y roles**, con acceso biométrico
-- **Contabilidad:** plan de cuentas, comprobantes, libro diario, libro mayor, balance de comprobación
-- **Inventario y almacenes:** entradas, salidas, transferencias, existencias
-- **Finanzas:** cobros, pagos, cuentas por cobrar y por pagar, caja y banco
-- **Activos fijos, costos y nómina**
-- **Reportes:** exportación a PDF, Excel y CSV
-- **Respaldo y restauración** local y en la nube
-- **Extras móviles:** escáner de códigos de barras, notificaciones, tema oscuro
+## Instalación
 
-## Stack tecnológico
+1. Ve a la sección [**Releases**](../../releases) y descarga el archivo `.apk` de la versión más reciente.
+2. Ábrelo en tu teléfono y permite la instalación de apps de fuentes desconocidas cuando Android lo pida.
+3. Requiere **Android 8.0 (API 26)** o superior.
+
+Las versiones se firman con la misma clave, así que puedes instalar una encima de otra sin desinstalar.
+
+## Uso rápido
+
+1. En **Cuentas**, toca **Nomenclador** y elige el tipo de entidad (estatal o no estatal).
+2. En **Comprobantes**, toca **+**, elige las cuentas, pon cada importe en débito o crédito y guarda cuando cuadre.
+3. En **Informes** consulta el diario, el mayor y el balance.
+4. En **Ajustes** crea un **respaldo** y guárdalo fuera del teléfono.
+
+## Tecnología
 
 | Área | Tecnología |
 |---|---|
 | Lenguaje | Kotlin |
-| UI | Jetpack Compose + Material 3 |
-| Base de datos | Room + SQLite (SQLCipher opcional) |
-| Arquitectura | MVVM + Clean Architecture |
+| Interfaz | Jetpack Compose + Material 3 |
+| Base de datos | Room (SQLite) con migraciones |
+| Arquitectura | MVVM, repositorios y módulos Gradle |
 | Inyección de dependencias | Hilt |
-| Red | Ktor / Retrofit |
-| Tareas en segundo plano | WorkManager |
-| CI | GitHub Actions |
-
-## Requisitos
-
-- Android Studio (versión estable más reciente)
-- JDK 17
-- Android SDK con `minSdk 26` (Android 8.0) o superior
+| Integración continua | GitHub Actions |
 
 ## Estructura del repositorio
 
 ```
-contamovil/
-├── app/                 # Módulo principal (navegación, DI)
-├── core/
-│   ├── database/        # Room, DAOs, migraciones
-│   ├── network/         # Cliente API y sincronización
-│   ├── ui/              # Tema y componentes compartidos
-│   └── common/          # Utilidades
-├── feature/
-│   ├── contabilidad/
-│   ├── inventario/
-│   ├── finanzas/
-│   └── ...
-├── docs/                # Documentación y decisiones de diseño
-├── .github/workflows/   # Integración continua
-├── README.md
-├── LICENSE
-└── .gitignore
+├── app/                    # Punto de entrada, tema y firma
+├── core/database/          # Room: entidades, DAOs, migraciones, respaldo
+├── feature/contabilidad/   # Pantallas, ViewModels y repositorios
+├── docs/                   # Arquitectura y notas del nomenclador
+└── .github/workflows/      # Compilación automática del APK
 ```
 
-## Cómo empezar
+## Compilar desde el código
+
+Requisitos: JDK 17, Android SDK 35 y Gradle 8.9.
 
 ```bash
-git clone https://github.com/TU_USUARIO/contamovil.git
-cd contamovil
+gradle assembleDebug
 ```
 
-1. Abre la carpeta en Android Studio.
-2. Espera a que Gradle sincronice.
-3. Ejecuta la app en un emulador o dispositivo (`Run ▶`).
+El APK queda en `app/build/outputs/apk/debug/`. También puedes dejar que **GitHub Actions** lo compile: cada ejecución sube el APK como *artifact*.
+
+> **Seguridad:** el repositorio incluye una clave de firma de **depuración** para poder actualizar las pruebas sin desinstalar. No sirve para publicar en una tienda de aplicaciones; para eso se usará una clave privada guardada como secreto.
 
 ## Hoja de ruta
 
-- [ ] **Fase 0:** estructura del proyecto, CI, tema base
-- [ ] **Fase 1:** usuarios, roles, login biométrico, catálogos
-- [ ] **Fase 2:** contabilidad (plan de cuentas, comprobantes, libros)
-- [ ] **Fase 3:** inventario y almacenes
-- [ ] **Fase 4:** finanzas (cobros, pagos, caja y banco)
-- [ ] **Fase 5:** activos fijos, costos y nómina
-- [ ] **Fase 6:** sincronización, respaldos, exportación de reportes
+- [x] Nomenclador de cuentas cubano
+- [x] Comprobantes con partida doble
+- [x] Libro diario, mayor y balance de comprobación
+- [x] Respaldo y restauración de datos
+- [ ] Editar comprobantes existentes
+- [ ] Saldos acumulados por subgrupo y grupo
+- [ ] Exportar informes a PDF y Excel
+- [ ] Cifrado de la base de datos
+- [ ] Acceso con huella o PIN
+- [ ] Inventario y almacenes
+- [ ] Cobros, pagos, cuentas por cobrar y por pagar
+- [ ] Activos fijos, costos y nómina
+- [ ] Soporte multimoneda
 
-## Cómo contribuir
+## Contribuir
 
 1. Haz un fork del repositorio.
-2. Crea una rama: `git checkout -b feature/mi-mejora`
-3. Haz commit de tus cambios: `git commit -m "Añade mi mejora"`
-4. Sube la rama: `git push origin feature/mi-mejora`
-5. Abre un Pull Request.
+2. Crea una rama: `git checkout -b mejora/mi-cambio`
+3. Haz commit de tus cambios: `git commit -m "Describe tu cambio"`
+4. Sube la rama y abre un Pull Request.
 
-Revisa los *issues* abiertos para ver en qué se puede ayudar.
+Los *issues* son bienvenidos: errores, ideas o dudas sobre el nomenclador.
 
 ## Licencia
 
-Distribuido bajo la licencia MIT. Consulta el archivo `LICENSE` para más información.
+Distribuido bajo la licencia MIT. Consulta el archivo `LICENSE`.
