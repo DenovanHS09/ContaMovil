@@ -11,7 +11,7 @@ import com.contamovil.core.database.entity.CuentaEntity
 
 @Database(
     entities = [CuentaEntity::class, ComprobanteEntity::class, AsientoEntity::class],
-    version = 3,
+    version = AppDatabase.VERSION,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -21,5 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val NOMBRE = "contamovil.db"
+        /** Versión actual del esquema. Cambiarla aquí al añadir una migración. */
+        const val VERSION = 3
     }
 }

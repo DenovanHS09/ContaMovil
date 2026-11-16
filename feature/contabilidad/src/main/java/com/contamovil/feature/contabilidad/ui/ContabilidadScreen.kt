@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 
-/** Pantalla principal del módulo: pestañas Cuentas, Comprobantes e Informes. */
+/** Pantalla principal del módulo: pestañas Cuentas, Comprobantes, Informes y Ajustes. */
 @Composable
 fun ContabilidadScreen(vm: ComprobantesViewModel = hiltViewModel()) {
     var pestana by rememberSaveable { mutableIntStateOf(0) }
@@ -46,13 +47,19 @@ fun ContabilidadScreen(vm: ComprobantesViewModel = hiltViewModel()) {
                         selected = pestana == 1,
                         onClick = { pestana = 1 },
                         icon = { Icon(Icons.Default.Edit, contentDescription = null) },
-                        label = { Text("Comprobantes") }
+                        label = { Text("Comprob.") }
                     )
                     NavigationBarItem(
                         selected = pestana == 2,
                         onClick = { pestana = 2 },
                         icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
                         label = { Text("Informes") }
+                    )
+                    NavigationBarItem(
+                        selected = pestana == 3,
+                        onClick = { pestana = 3 },
+                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        label = { Text("Ajustes") }
                     )
                 }
             }
@@ -61,7 +68,8 @@ fun ContabilidadScreen(vm: ComprobantesViewModel = hiltViewModel()) {
                 when (pestana) {
                     0 -> PlanCuentasScreen()
                     1 -> ComprobantesScreen(vm = vm, onNuevo = { vm.nuevo(); creando = true })
-                    else -> InformesScreen()
+                    2 -> InformesScreen()
+                    else -> AjustesScreen()
                 }
             }
         }
