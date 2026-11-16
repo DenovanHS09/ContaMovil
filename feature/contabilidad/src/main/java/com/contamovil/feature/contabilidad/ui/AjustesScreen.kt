@@ -1,5 +1,6 @@
 package com.contamovil.feature.contabilidad.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,7 +45,7 @@ private fun textoUltimoRespaldo(ms: Long): String =
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AjustesScreen(vm: AjustesViewModel = hiltViewModel()) {
+private fun AjustesContenido(onVerNormativa: () -> Unit, vm: AjustesViewModel = hiltViewModel()) {
     val ui by vm.ui.collectAsStateWithLifecycle()
 
     val crearArchivo = rememberLauncherForActivityResult(
@@ -83,6 +87,14 @@ fun AjustesScreen(vm: AjustesViewModel = hiltViewModel()) {
             ) { Text("Restaurar respaldo") }
             if (ui.trabajando) CircularProgressIndicator()
             ui.mensaje?.let { Text(it) }
+
+            Text("Normativa", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Consulta las normas que sustentan el nomenclador, qué cambió cada una y el historial de cada cuenta."
+            )
+            OutlinedButton(onClick = onVerNormativa, modifier = Modifier.fillMaxWidth()) {
+                Text("Normativa del nomenclador")
+            }
         }
     }
 
@@ -109,5 +121,16 @@ fun AjustesScreen(vm: AjustesViewModel = hiltViewModel()) {
             text = { Text(mensaje) },
             confirmButton = { TextButton(onClick = { vm.reiniciar() }) { Text("Reiniciar app") } }
         )
+    }
+}
+
+@Composable
+fun AjustesScreen() {
+    var verNormativa by rememberSaveable { mutableStateOf(false) }
+    if (verNormativa) {
+        BackHandler { verNormativa = false }
+        NormativaScreen(onVolver = { verNormativa = false })
+    } else {
+        AjustesContenido(onVerNormativa = { verNormativa = true })
     }
 }

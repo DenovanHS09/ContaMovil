@@ -15,6 +15,9 @@ import com.contamovil.core.database.entity.TipoCuenta
  * y el rango queda indicado entre corchetes en el nombre: el usuario puede abrir los demás
  * códigos del rango. Se omiten las cuentas de uso exclusivo de empresas de seguro.
  *
+ * Incluye las modificaciones de la Resolución 407/2019 (cuentas 350, 576 a 580 y subcuentas de la 914).
+ * La trazabilidad normativa (norma de origen, vigencia, estado) está en NormativaBase.
+ *
  * IMPORTANTE: verificar siempre contra la versión vigente publicada por el MFP.
  */
 enum class VarianteNomenclador { ESTATAL, NO_ESTATAL }
@@ -293,6 +296,7 @@ private fun Constructor.activos() {
     c("347", null, "Cuentas por Cobrar en Litigio", DEUDORA, S6)
     c("348", null, "Efectos por Cobrar Protestados", DEUDORA, S6)
     c("349", null, "Cuentas por Cobrar en Proceso Judicial", DEUDORA, S6)
+    c("350", null, "Cuentas por Cobrar con Sentencia Firme", DEUDORA, S6)
     c("354", "355", "Depósitos y Fianzas", DEUDORA)
     c("363", null, "Bonos Redimidos", DEUDORA)
     c("364", null, "Fondo de Amortización de Bonos - Efectivo y Valores", DEUDORA)
@@ -358,6 +362,11 @@ private fun Constructor.pasivos() {
     c("569", null, "Cuentas por Pagar - Compra de Monedas", ACREEDORA)
     c("570", "574", "Ingresos de Períodos Futuros", ACREEDORA)
     c("575", null, "Obligación con el Presupuesto del Estado por Garantía Activada", ACREEDORA)
+    c("576", null, "Efectos por Pagar en Litigio", ACREEDORA, S6)
+    c("577", null, "Cuentas por Pagar en Litigio", ACREEDORA, S6)
+    c("578", null, "Efectos por Pagar Protestados", ACREEDORA, S6)
+    c("579", null, "Cuentas por Pagar en Proceso Judicial", ACREEDORA, S6)
+    c("580", null, "Cuentas por Pagar con Sentencia Firme", ACREEDORA, S6)
 }
 
 private fun Constructor.patrimonio(v: VarianteNomenclador) {
@@ -482,7 +491,10 @@ private fun Constructor.nominales() {
 
     subgrupo("50.2", "CUENTAS NOMINALES ACREEDORAS", TipoCuenta.INGRESO)
     c("900", "913", "Ventas", ACREEDORA)
-    c("914", null, "Ventas de Bienes con destino a la Exportación", ACREEDORA)
+    c(
+        "914", null, "Ventas de Bienes con destino a la Exportación", ACREEDORA,
+        listOf(Sub("0010", "Productores"), Sub("0020", "Exportadores"))
+    )
     c("915", null, "Ventas por Exportación de Servicios", ACREEDORA)
     c("916", "919", "Subvenciones", ACREEDORA)
     c("920", "922", "Ingresos Financieros", ACREEDORA)
