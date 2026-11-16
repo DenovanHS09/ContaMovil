@@ -36,6 +36,10 @@ object NormativaBase {
     const val R407 = "RES-407-2019"
     const val R166 = "RES-166-2021"
     const val R39 = "RES-39-2023"
+    const val R346 = "RES-346-2021"
+    const val R351 = "RES-351-2021"
+    const val R272 = "RES-272-2024"
+    const val R306 = "RES-306-2023"
 
     private const val MFP = "Ministerio de Finanzas y Precios"
     private const val VIGENCIA_407 = "2019-10-01"
@@ -145,6 +149,55 @@ object NormativaBase {
             observaciones = "Texto oficial leído. Pertenece a la contabilidad gubernamental: no es el nomenclador " +
                 "empresarial y no se carga como cuentas. No menciona la Res. 494/2016. Se aplica a operaciones " +
                 "desde el primero de enero (el año no se precisa en el texto)."
+        ),
+        NormaEntity(
+            codigo = R346, numero = 346, anio = 2021, organismo = MFP,
+            titulo = "Norma Específica de Contabilidad de la Actividad de Trabajo por Cuenta Propia (antecedente)",
+            gaceta = "Gaceta Oficial No. 94 Ordinaria de 2021 (según fuentes secundarias)",
+            instrumento = InstrumentoNorma.NORMA_CONTABLE,
+            estado = EstadoNorma.DEROGADA, derogadaPorCodigo = R272,
+            verificacion = VerificacionNorma.SOLO_FICHA_GACETA,
+            observaciones = "La ficha de la Res. 272/2024 indica que la deroga. Hoy los trabajadores por cuenta propia " +
+                "que llevan contabilidad aplican las Normas Cubanas de Información Financiera de la actividad empresarial."
+        ),
+        NormaEntity(
+            codigo = R351, numero = 351, anio = 2021, organismo = MFP,
+            titulo = "Dispone que las MIPYMES apliquen las Normas Cubanas de Información Financiera " +
+                "para el registro contable de sus operaciones",
+            gaceta = "Gaceta Oficial No. 94 Ordinaria de 2021",
+            fechaFirma = "2021-08-14", fechaPublicacion = "2021-08-19",
+            instrumento = InstrumentoNorma.NORMA_CONTABLE,
+            estado = EstadoNorma.SIN_VERIFICAR,
+            verificacion = VerificacionNorma.SOLO_DOCUMENTO_INFORMATIVO,
+            observaciones = "Texto no leído. Según documentos informativos del MEP y del MFP, las MIPYMES usan el " +
+                "nomenclador y los demás instrumentos contables de la actividad empresarial y emiten sus estados " +
+                "financieros. Una fuente secundaria añade que autoriza usar la cuenta 600 para los aportes de los " +
+                "socios (sin verificar). Su estado en la Gaceta no se ha comprobado."
+        ),
+        NormaEntity(
+            codigo = R306, numero = 306, anio = 2023, organismo = MFP,
+            titulo = "Regulaciones tributarias, financieras y de precios de las MIPYMES",
+            gaceta = "No verificada",
+            fechaFirma = "2023-12-30",
+            instrumento = InstrumentoNorma.OTRA_RELACIONADA,
+            estado = EstadoNorma.SIN_VERIFICAR,
+            verificacion = VerificacionNorma.SOLO_DOCUMENTO_INFORMATIVO,
+            observaciones = "Fecha según un índice normativo secundario. Texto no leído: no se sabe si afecta a la " +
+                "parte contable."
+        ),
+        NormaEntity(
+            codigo = R272, numero = 272, anio = 2024, organismo = MFP,
+            titulo = "Actualiza la contabilidad de las operaciones de los trabajadores por cuenta propia según " +
+                "sus ingresos anuales (deroga la Res. 346/2021)",
+            gaceta = "Gaceta Oficial No. 78 Ordinaria de 2024", identificador = "GOC-2024-454-O78",
+            fechaPublicacion = "2024-08-19",
+            instrumento = InstrumentoNorma.NORMA_CONTABLE,
+            estado = EstadoNorma.VIGENTE,
+            verificacion = VerificacionNorma.SOLO_FICHA_GACETA,
+            observaciones = "La ficha de la Gaceta no registra modificaciones ni derogación. Según un resumen de la norma, " +
+                "obliga a llevar contabilidad a quienes superan 500 000 CUP anuales de ingresos. El MFP (Dirección " +
+                "de Política Contable) confirma en una consulta que estos trabajadores usan el nomenclador de la " +
+                "Res. 494/2016. Texto no leído; la fecha de publicación procede de una consulta del MFP."
         )
     )
 

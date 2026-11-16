@@ -6,10 +6,12 @@ import com.contamovil.core.database.AppDatabase
 import com.contamovil.core.database.MIGRACION_1_2
 import com.contamovil.core.database.MIGRACION_2_3
 import com.contamovil.core.database.MIGRACION_3_4
+import com.contamovil.core.database.MIGRACION_4_5
 import com.contamovil.core.database.dao.ComprobanteDao
 import com.contamovil.core.database.dao.CuentaDao
 import com.contamovil.core.database.dao.InformeDao
 import com.contamovil.core.database.dao.NormativaDao
+import com.contamovil.core.database.dao.PerfilDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +27,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NOMBRE)
-            .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
+            .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4, MIGRACION_4_5)
             // TODO: añadir SQLCipher (SupportFactory) para cifrar la base de datos
             .build()
 
@@ -40,4 +42,7 @@ object DatabaseModule {
 
     @Provides
     fun provideNormativaDao(db: AppDatabase): NormativaDao = db.normativaDao()
+
+    @Provides
+    fun providePerfilDao(db: AppDatabase): PerfilDao = db.perfilDao()
 }

@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.core.database.entity.TipoCuenta
+import com.contamovil.core.database.entity.TipoEntidad
 import com.contamovil.feature.contabilidad.data.CuentaRepository
-import com.contamovil.feature.contabilidad.data.VarianteNomenclador
+import com.contamovil.feature.contabilidad.data.PerfilRepository
+import com.contamovil.feature.contabilidad.data.varianteNomenclador
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,12 +29,17 @@ data class FilaCuenta(
 
 @HiltViewModel
 class PlanCuentasViewModel @Inject constructor(
-    private val repo: CuentaRepository
+    private val repo: CuentaRepository,
+    private val perfil: PerfilRepository
 ) : ViewModel() {
 
     private val _expandidas = MutableStateFlow<Set<Long>>(emptySet())
     private val _busqueda = MutableStateFlow("")
     val busqueda: StateFlow<String> = _busqueda
+
+    /** Tipo de entidad elegido (null si aún no se ha definido). */
+    val tipoEntidad: StateFlow<TipoEntidad?> = perfil.tipo
+        .stateIn<TipoEntidad?>(viewModelScope, SharingStarted.Lazily, null)
 
     /**
      * Filas que se muestran: solo las ramas desplegadas, o los resultados planos si hay
@@ -98,8 +105,12 @@ class PlanCuentasViewModel @Inject constructor(
         }
     }
 
-    fun cargarNomenclador(variante: VarianteNomenclador) {
-        viewModelScope.launch { repo.cargarNomenclador(variante) }
+    /** Guarda el tipo de entidad y carga el nomenclador con la variante de patrimonio que le corresponde. */
+    fun cargarNomenclador(tipo: TipoEntidad) {
+        viewModelScope.launch {
+            perfil.guardar(tipo)
+            repo.cargarNomenclador(tipo.varianteNomenclador())
+        }
     }
 
     private fun construirFilas(

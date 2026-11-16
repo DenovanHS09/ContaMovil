@@ -49,6 +49,7 @@ import com.contamovil.feature.contabilidad.data.VarianteNomenclador
 fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
     val filas by vm.filas.collectAsStateWithLifecycle()
     val todas by vm.cuentas.collectAsStateWithLifecycle()
+    val tipoEntidad by vm.tipoEntidad.collectAsStateWithLifecycle()
     val busqueda by vm.busqueda.collectAsStateWithLifecycle()
     val error by vm.error.collectAsStateWithLifecycle()
     var mostrarDialogo by remember { mutableStateOf(false) }
@@ -123,28 +124,15 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
     }
 
     if (mostrarNomenclador) {
-        AlertDialog(
-            onDismissRequest = { mostrarNomenclador = false },
-            title = { Text("Nomenclador de cuentas (Cuba)") },
-            text = {
-                Text(
-                    "Carga el nomenclador de la Resolución 494/2016 del MFP. " +
-                        "Elige el tipo de entidad: solo cambia el grupo 30 (patrimonio). " +
-                        "Si ya existen cuentas con el mismo código, no se tocan."
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    vm.cargarNomenclador(VarianteNomenclador.ESTATAL)
-                    mostrarNomenclador = false
-                }) { Text("Estatal") }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    vm.cargarNomenclador(VarianteNomenclador.NO_ESTATAL)
-                    mostrarNomenclador = false
-                }) { Text("No estatal") }
-            }
+        SelectorTipoEntidadDialog(
+            titulo = "Nomenclador de cuentas (Cuba)",
+            explicacion = "Carga el nomenclador de la Resolución 494/2016 y sus modificaciones. " +
+                "Elige tu tipo de entidad: define la variante del patrimonio (grupo 30). " +
+                "Si ya existen cuentas con el mismo código, no se tocan.",
+            actual = tipoEntidad,
+            textoConfirmar = "Cargar",
+            onElegir = { vm.cargarNomenclador(it); mostrarNomenclador = false },
+            onCerrar = { mostrarNomenclador = false }
         )
     }
 }

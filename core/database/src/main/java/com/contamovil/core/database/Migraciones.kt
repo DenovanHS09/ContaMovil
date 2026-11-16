@@ -124,3 +124,16 @@ val MIGRACION_3_4 = object : Migration(3, 4) {
         )
     }
 }
+
+/** v4 -> v5: perfil de la entidad (tipo de entidad). Solo crea una tabla nueva. */
+val MIGRACION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `perfil_entidad` (" +
+                "`id` INTEGER NOT NULL, " +
+                "`tipoEntidad` TEXT NOT NULL, " +
+                "`actualizadoEn` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`id`))"
+        )
+    }
+}

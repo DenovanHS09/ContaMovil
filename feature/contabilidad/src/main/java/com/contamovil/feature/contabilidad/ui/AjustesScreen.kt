@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contamovil.feature.contabilidad.data.nombreVisible
+import com.contamovil.feature.contabilidad.data.textoVariante
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -47,6 +49,8 @@ private fun textoUltimoRespaldo(ms: Long): String =
 @Composable
 private fun AjustesContenido(onVerNormativa: () -> Unit, vm: AjustesViewModel = hiltViewModel()) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    val tipo by vm.tipoEntidad.collectAsStateWithLifecycle()
+    var cambiandoTipo by rememberSaveable { mutableStateOf(false) }
 
     val crearArchivo = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/octet-stream")
@@ -88,6 +92,14 @@ private fun AjustesContenido(onVerNormativa: () -> Unit, vm: AjustesViewModel = 
             if (ui.trabajando) CircularProgressIndicator()
             ui.mensaje?.let { Text(it) }
 
+            Text("Tipo de entidad", style = MaterialTheme.typography.titleMedium)
+            Text(
+                tipo?.let { "${it.nombreVisible()}. Patrimonio (grupo 30): variante ${it.textoVariante()}." }
+                    ?: "Sin definir. Se te pedirá al cargar el nomenclador."
+            )
+            OutlinedButton(onClick = { cambiandoTipo = true }, modifier = Modifier.fillMaxWidth()) {
+                Text("Cambiar tipo de entidad")
+            }
             Text("Normativa", style = MaterialTheme.typography.titleMedium)
             Text(
                 "Consulta las normas que sustentan el nomenclador, qué cambió cada una y el historial de cada cuenta."
@@ -96,6 +108,18 @@ private fun AjustesContenido(onVerNormativa: () -> Unit, vm: AjustesViewModel = 
                 Text("Normativa del nomenclador")
             }
         }
+    }
+
+    if (cambiandoTipo) {
+        SelectorTipoEntidadDialog(
+            titulo = "Tipo de entidad",
+            explicacion = "Cambia tu perfil y las normas que se muestran. Si pasas de estatal a no estatal " +
+                "(o al revés), las cuentas del grupo 30 ya cargadas no se reemplazan.",
+            actual = tipo,
+            textoConfirmar = "Guardar",
+            onElegir = { vm.guardarTipoEntidad(it); cambiandoTipo = false },
+            onCerrar = { cambiandoTipo = false }
+        )
     }
 
     ui.pendiente?.let {

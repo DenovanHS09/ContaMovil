@@ -29,3 +29,18 @@ consulta formal a la Dirección de Política Contable del MFP.
 - `normas`: una fila por disposición, con fuente, fechas, estado y grado de verificación.
 - `cuenta_versiones`: qué decía el nomenclador de cada cuenta y desde cuándo (por código).
 - `cambios_normativos`: qué cambió cada norma en cada cuenta, con su estado.
+
+## Tipos de entidad (MIPYME y trabajadores por cuenta propia)
+ContaMovil guarda el tipo de entidad (MIPYME privada, MIPYME estatal, trabajador por cuenta propia, otra
+entidad estatal u otra no estatal). Decide la variante del grupo 30 al cargar el nomenclador y qué normas
+se muestran como relacionadas.
+
+| Norma | Estado registrado | Verificación |
+|---|---|---|
+| Res. 351/2021 (MIPYMES: aplican las NCIF) | Sin verificar | Solo documentos informativos |
+| Res. 306/2023 (regulaciones tributarias, financieras y de precios de MIPYMES) | Sin verificar | Solo documentos informativos |
+| Res. 272/2024 (contabilidad de trabajadores por cuenta propia) | Vigente | Solo ficha de la Gaceta |
+| Res. 346/2021 (norma contable de trabajadores por cuenta propia) | Derogada por la 272/2024 | Solo ficha de la Gaceta |
+
+La asignación de la variante no estatal a los trabajadores por cuenta propia es una propuesta, no una
+disposición confirmada.

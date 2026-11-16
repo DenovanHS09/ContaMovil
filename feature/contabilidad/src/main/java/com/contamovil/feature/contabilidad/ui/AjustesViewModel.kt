@@ -4,9 +4,13 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contamovil.core.database.RespaldoManager
+import com.contamovil.core.database.entity.TipoEntidad
+import com.contamovil.feature.contabilidad.data.PerfilRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,11 +27,19 @@ data class AjustesUi(
 
 @HiltViewModel
 class AjustesViewModel @Inject constructor(
-    private val manager: RespaldoManager
+    private val manager: RespaldoManager,
+    private val perfil: PerfilRepository
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(AjustesUi(ultimoRespaldo = manager.ultimoRespaldo()))
     val ui: StateFlow<AjustesUi> = _ui
+
+    val tipoEntidad: StateFlow<TipoEntidad?> = perfil.tipo
+        .stateIn<TipoEntidad?>(viewModelScope, SharingStarted.Lazily, null)
+
+    fun guardarTipoEntidad(tipo: TipoEntidad) {
+        viewModelScope.launch { perfil.guardar(tipo) }
+    }
 
     fun exportar(destino: Uri) {
         _ui.update { it.copy(trabajando = true, mensaje = null) }
