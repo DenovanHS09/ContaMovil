@@ -76,14 +76,16 @@ fun NormativaScreen(onVolver: () -> Unit, vm: NormativaViewModel = hiltViewModel
                 Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                listOf("Normas", "Cambios", "Cuenta").forEachIndexed { i, titulo ->
+                listOf("Normas", "Cambios", "Cuenta", "Revisiones", "Auditoría").forEachIndexed { i, titulo ->
                     FilterChip(selected = vista == i, onClick = { vista = i }, label = { Text(titulo) })
                 }
             }
             when (vista) {
                 0 -> NormasVista(vm)
                 1 -> CambiosVista(vm)
-                else -> CuentaVista(vm)
+                2 -> CuentaVista(vm)
+                3 -> RevisionesVista(vm)
+                else -> AuditoriaVista(vm)
             }
         }
     }
@@ -218,6 +220,81 @@ private fun CuentaVista(vm: NormativaViewModel) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RevisionesVista(vm: NormativaViewModel) {
+    val revisiones by vm.revisiones.collectAsStateWithLifecycle()
+    if (revisiones.isEmpty()) {
+        Text("Aún no hay revisiones registradas. Cada corrección de datos normativos queda anotada aquí, con su valor anterior.")
+    } else {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(revisiones, key = { it.id }) { r ->
+                OutlinedCard(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text("${r.tabla} · ${r.registro}", style = MaterialTheme.typography.titleSmall)
+                        Text("Campo: ${r.campo}")
+                        Text("Antes: ${r.valorAnterior ?: "(vacío)"}", style = MaterialTheme.typography.bodySmall)
+                        Text("Ahora: ${r.valorNuevo ?: "(vacío)"}", style = MaterialTheme.typography.bodySmall)
+                        Text("Motivo: ${r.motivo}", style = MaterialTheme.typography.bodySmall)
+                        Text("Fuente: ${r.fuente}", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AuditoriaVista(vm: NormativaViewModel) {
+    val resultado by vm.auditoria.collectAsStateWithLifecycle()
+    val tipo by vm.tipoEntidad.collectAsStateWithLifecycle()
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            "Compara las cuentas guardadas en el teléfono con el nomenclador " +
+                "(variante ${if (tipo == null) "estatal, por defecto" else "de tu tipo de entidad"}). " +
+                "Es de solo lectura: no modifica nada."
+        )
+        Button(onClick = { vm.auditar() }, modifier = Modifier.fillMaxWidth()) { Text("Ejecutar auditoría") }
+        val r = resultado
+        if (r != null) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text("Cuentas en el teléfono: ${r.totalEnBase} · esperadas: ${r.totalEsperado}")
+                        Text(
+                            if (r.sinProblemas) "Sin diferencias con el nomenclador ✓"
+                            else "Hay diferencias que revisar",
+                            color = if (r.sinProblemas) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+                item { SeccionAuditoria("Faltan en el teléfono", r.faltantes) }
+                item { SeccionAuditoria("Del grupo 30 de la otra variante", r.deOtraVariante) }
+                item { SeccionAuditoria("Nombre distinto del nomenclador", r.nombresDistintos) }
+                item { SeccionAuditoria("Naturaleza distinta", r.naturalezaDistinta) }
+                item { SeccionAuditoria("Cuenta madre distinta", r.madreDistinta) }
+                item { SeccionAuditoria("Huérfanas (madre inexistente)", r.huerfanas) }
+                item { SeccionAuditoria("Códigos duplicados", r.duplicadas) }
+                item { SeccionAuditoria("Creadas por ti (informativo)", r.creadasPorTi) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SeccionAuditoria(titulo: String, elementos: List<String>) {
+    if (elementos.isEmpty()) return
+    OutlinedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text("$titulo (${elementos.size})", style = MaterialTheme.typography.titleSmall)
+            elementos.take(30).forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+            if (elementos.size > 30) {
+                Text("… y ${elementos.size - 30} más", style = MaterialTheme.typography.bodySmall)
             }
         }
     }

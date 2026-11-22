@@ -14,6 +14,7 @@ import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.core.database.entity.CuentaVersionEntity
 import com.contamovil.core.database.entity.NormaEntity
 import com.contamovil.core.database.entity.PerfilEntidadEntity
+import com.contamovil.core.database.entity.RevisionNormativaEntity
 
 @Database(
     entities = [
@@ -23,7 +24,8 @@ import com.contamovil.core.database.entity.PerfilEntidadEntity
         NormaEntity::class,
         CuentaVersionEntity::class,
         CambioNormativoEntity::class,
-        PerfilEntidadEntity::class
+        PerfilEntidadEntity::class,
+        RevisionNormativaEntity::class
     ],
     version = AppDatabase.VERSION,
     exportSchema = true
@@ -38,6 +40,6 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         const val NOMBRE = "contamovil.db"
         /** Versión actual del esquema. Cambiarla aquí al añadir una migración. */
-        const val VERSION = 5
+        const val VERSION = 6
     }
 }

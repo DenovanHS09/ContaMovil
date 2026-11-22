@@ -137,3 +137,26 @@ val MIGRACION_4_5 = object : Migration(4, 5) {
         )
     }
 }
+
+/** v5 -> v6: registro de revisiones normativas. Solo crea una tabla nueva. */
+val MIGRACION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `normas_revisiones` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`clave` TEXT NOT NULL, " +
+                "`tabla` TEXT NOT NULL, " +
+                "`registro` TEXT NOT NULL, " +
+                "`campo` TEXT NOT NULL, " +
+                "`valorAnterior` TEXT, " +
+                "`valorNuevo` TEXT, " +
+                "`motivo` TEXT NOT NULL, " +
+                "`fuente` TEXT NOT NULL, " +
+                "`aplicadoEn` INTEGER NOT NULL)"
+        )
+        db.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_normas_revisiones_clave` " +
+                "ON `normas_revisiones` (`clave`)"
+        )
+    }
+}

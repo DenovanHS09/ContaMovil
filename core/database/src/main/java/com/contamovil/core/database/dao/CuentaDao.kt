@@ -15,6 +15,9 @@ interface CuentaDao {
     @Query("SELECT * FROM cuentas ORDER BY codigo")
     fun observarTodas(): Flow<List<CuentaEntity>>
 
+    @Query("SELECT * FROM cuentas")
+    suspend fun listarTodas(): List<CuentaEntity>
+
     @Query("SELECT * FROM cuentas WHERE id = :id")
     suspend fun obtener(id: Long): CuentaEntity?
 
