@@ -67,7 +67,11 @@ fun ContabilidadScreen(vm: ComprobantesViewModel = hiltViewModel()) {
             Box(Modifier.padding(padding)) {
                 when (pestana) {
                     0 -> PlanCuentasScreen()
-                    1 -> ComprobantesScreen(vm = vm, onNuevo = { vm.nuevo(); creando = true })
+                    1 -> ComprobantesScreen(
+                        vm = vm,
+                        onNuevo = { vm.nuevo(); creando = true },
+                        onEditar = { r -> vm.editar(r) { creando = true } }
+                    )
                     2 -> InformesScreen()
                     else -> AjustesScreen()
                 }

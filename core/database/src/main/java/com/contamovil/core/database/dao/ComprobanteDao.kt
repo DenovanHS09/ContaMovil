@@ -20,7 +20,8 @@ data class ComprobanteResumen(
     val numero: Int,
     val fecha: Long,
     val concepto: String,
-    val total: Long
+    val total: Long,
+    val modificadoEn: Long? = null
 )
 
 data class LineaDetalle(
@@ -71,6 +72,42 @@ abstract class ComprobanteDao {
         return id
     }
 
+    @Query("SELECT * FROM comprobantes WHERE id = :id")
+    abstract suspend fun obtener(id: Long): ComprobanteEntity?
+
+    @Query("SELECT * FROM asientos WHERE comprobanteId = :id ORDER BY id")
+    abstract suspend fun asientosDe(id: Long): List<AsientoEntity>
+
+    @Query("UPDATE comprobantes SET fecha = :fecha, concepto = :concepto, modificadoEn = :ahora WHERE id = :id")
+    protected abstract suspend fun actualizarCabecera(id: Long, fecha: Long, concepto: String, ahora: Long)
+
+    @Query("DELETE FROM asientos WHERE comprobanteId = :id")
+    protected abstract suspend fun borrarAsientos(id: Long)
+
+    /**
+     * Sustituye la fecha, el concepto y las líneas de un comprobante existente. Conserva su número.
+     * Todo ocurre en una sola transacción: si algo falla, el comprobante queda como estaba.
+     */
+    @Transaction
+    open suspend fun actualizar(id: Long, fecha: Long, concepto: String, lineas: List<NuevoAsiento>) {
+        require(lineas.sumOf { it.debito } == lineas.sumOf { it.credito }) {
+            "El comprobante no cuadra: débitos distintos de créditos"
+        }
+        actualizarCabecera(id, fecha, concepto, System.currentTimeMillis())
+        borrarAsientos(id)
+        insertarAsientos(
+            lineas.map {
+                AsientoEntity(
+                    comprobanteId = id,
+                    cuentaId = it.cuentaId,
+                    debito = it.debito,
+                    credito = it.credito,
+                    descripcion = it.descripcion
+                )
+            }
+        )
+    }
+
     /** Borra el comprobante; sus líneas se borran en cascada. */
     @Query("DELETE FROM comprobantes WHERE id = :id")
     abstract suspend fun eliminar(id: Long)
@@ -78,7 +115,7 @@ abstract class ComprobanteDao {
     @Query(
         """
         SELECT c.id AS id, c.numero AS numero, c.fecha AS fecha, c.concepto AS concepto,
-               COALESCE(SUM(a.debito), 0) AS total
+               COALESCE(SUM(a.debito), 0) AS total, c.modificadoEn AS modificadoEn
         FROM comprobantes c
         LEFT JOIN asientos a ON a.comprobanteId = c.id
         GROUP BY c.id

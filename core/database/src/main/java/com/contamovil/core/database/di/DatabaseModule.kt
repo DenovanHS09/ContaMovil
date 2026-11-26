@@ -8,6 +8,7 @@ import com.contamovil.core.database.MIGRACION_2_3
 import com.contamovil.core.database.MIGRACION_3_4
 import com.contamovil.core.database.MIGRACION_4_5
 import com.contamovil.core.database.MIGRACION_5_6
+import com.contamovil.core.database.MIGRACION_6_7
 import com.contamovil.core.database.dao.ComprobanteDao
 import com.contamovil.core.database.dao.CuentaDao
 import com.contamovil.core.database.dao.InformeDao
@@ -29,7 +30,8 @@ object DatabaseModule {
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NOMBRE)
             .addMigrations(
-                MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4, MIGRACION_4_5, MIGRACION_5_6
+                MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4, MIGRACION_4_5, MIGRACION_5_6,
+                MIGRACION_6_7
             )
             // TODO: añadir SQLCipher (SupportFactory) para cifrar la base de datos
             .build()

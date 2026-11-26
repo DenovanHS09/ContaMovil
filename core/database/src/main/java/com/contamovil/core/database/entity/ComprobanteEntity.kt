@@ -15,5 +15,7 @@ data class ComprobanteEntity(
     /** Fecha como día de época (LocalDate.toEpochDay). */
     val fecha: Long,
     val concepto: String,
-    val creadoEn: Long
+    val creadoEn: Long,
+    /** Momento (ms) de la última edición; null si nunca se ha editado. */
+    val modificadoEn: Long? = null
 )

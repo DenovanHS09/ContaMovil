@@ -47,16 +47,27 @@ import com.contamovil.core.database.dao.LineaDetalle
 import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.feature.contabilidad.data.FORMATO_FECHA
 import com.contamovil.feature.contabilidad.data.formatCentavos
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 
 private fun fechaTexto(epochDia: Long): String =
     LocalDate.ofEpochDay(epochDia).format(FORMATO_FECHA)
 
+private fun fechaHoraTexto(ms: Long): String =
+    Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault())
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+
 /** Lista de comprobantes registrados. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComprobantesScreen(vm: ComprobantesViewModel, onNuevo: () -> Unit) {
+fun ComprobantesScreen(
+    vm: ComprobantesViewModel,
+    onNuevo: () -> Unit,
+    onEditar: (ComprobanteResumen) -> Unit
+) {
     val lista by vm.comprobantes.collectAsStateWithLifecycle()
     var seleccionado by remember { mutableStateOf<ComprobanteResumen?>(null) }
 
@@ -78,7 +89,12 @@ fun ComprobantesScreen(vm: ComprobantesViewModel, onNuevo: () -> Unit) {
                 items(lista, key = { it.id }) { c ->
                     ListItem(
                         modifier = Modifier.clickable { seleccionado = c },
-                        overlineContent = { Text("N.º ${c.numero} · ${fechaTexto(c.fecha)}") },
+                        overlineContent = {
+                            Text(
+                                "N.º ${c.numero} · ${fechaTexto(c.fecha)}" +
+                                    if (c.modificadoEn != null) " · editado" else ""
+                            )
+                        },
                         headlineContent = { Text(c.concepto) },
                         trailingContent = { Text("${formatCentavos(c.total)} CUP") }
                     )
@@ -88,7 +104,12 @@ fun ComprobantesScreen(vm: ComprobantesViewModel, onNuevo: () -> Unit) {
     }
 
     seleccionado?.let { c ->
-        DetalleComprobanteDialog(vm = vm, comprobante = c, onCerrar = { seleccionado = null })
+        DetalleComprobanteDialog(
+            vm = vm,
+            comprobante = c,
+            onCerrar = { seleccionado = null },
+            onEditar = { seleccionado = null; onEditar(c) }
+        )
     }
 }
 
@@ -96,9 +117,11 @@ fun ComprobantesScreen(vm: ComprobantesViewModel, onNuevo: () -> Unit) {
 private fun DetalleComprobanteDialog(
     vm: ComprobantesViewModel,
     comprobante: ComprobanteResumen,
-    onCerrar: () -> Unit
+    onCerrar: () -> Unit,
+    onEditar: () -> Unit
 ) {
     var lineas by remember { mutableStateOf<List<LineaDetalle>?>(null) }
+    var confirmarBorrado by remember { mutableStateOf(false) }
     LaunchedEffect(comprobante.id) { lineas = vm.detalle(comprobante.id) }
 
     AlertDialog(
@@ -110,6 +133,9 @@ private fun DetalleComprobanteDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text("${fechaTexto(comprobante.fecha)} · ${comprobante.concepto}")
+                comprobante.modificadoEn?.let {
+                    Text("Modificado: ${fechaHoraTexto(it)}", style = MaterialTheme.typography.bodySmall)
+                }
                 lineas?.forEach { l ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Column(Modifier.weight(1f)) {
@@ -126,11 +152,32 @@ private fun DetalleComprobanteDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onCerrar) { Text("Cerrar") } },
-        dismissButton = {
-            TextButton(onClick = { vm.eliminar(comprobante.id); onCerrar() }) { Text("Eliminar") }
-        }
+        confirmButton = {
+            Row {
+                TextButton(onClick = onEditar) { Text("Editar") }
+                TextButton(onClick = onCerrar) { Text("Cerrar") }
+            }
+        },
+        dismissButton = { TextButton(onClick = { confirmarBorrado = true }) { Text("Eliminar") } }
     )
+
+    if (confirmarBorrado) {
+        AlertDialog(
+            onDismissRequest = { confirmarBorrado = false },
+            title = { Text("¿Eliminar el comprobante?") },
+            text = {
+                Text("Se eliminará el comprobante N.º ${comprobante.numero} con todas sus líneas. No se puede deshacer.")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.eliminar(comprobante.id)
+                    confirmarBorrado = false
+                    onCerrar()
+                }) { Text("Eliminar") }
+            },
+            dismissButton = { TextButton(onClick = { confirmarBorrado = false }) { Text("Cancelar") } }
+        )
+    }
 }
 
 /** Formulario para registrar un comprobante con partida doble. */
@@ -147,7 +194,7 @@ fun NuevoComprobanteScreen(vm: ComprobantesViewModel, onTerminar: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Nuevo comprobante") },
+                title = { Text(form.numero?.let { "Editar comprobante N.º $it" } ?: "Nuevo comprobante") },
                 navigationIcon = {
                     IconButton(onClick = onTerminar) {
                         Icon(Icons.Default.Close, contentDescription = "Cancelar")

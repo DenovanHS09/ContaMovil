@@ -32,3 +32,7 @@ fun formatSaldo(saldo: Long): String = when {
     saldo < 0 -> formatCentavos(-saldo) + " A"
     else -> "0.00"
 }
+
+/** Centavos a texto editable ("150050" -> "1500.50"), que [parseCentavos] vuelve a leer sin pérdida. */
+fun centavosATexto(centavos: Long): String =
+    "${centavos / 100}.${(centavos % 100).toString().padStart(2, '0')}"

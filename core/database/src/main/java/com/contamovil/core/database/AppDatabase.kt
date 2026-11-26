@@ -40,6 +40,6 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         const val NOMBRE = "contamovil.db"
         /** Versión actual del esquema. Cambiarla aquí al añadir una migración. */
-        const val VERSION = 6
+        const val VERSION = 7
     }
 }

@@ -160,3 +160,10 @@ val MIGRACION_5_6 = object : Migration(5, 6) {
         )
     }
 }
+
+/** v6 -> v7: marca de edición de los comprobantes (columna opcional; no toca ningún dato). */
+val MIGRACION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `comprobantes` ADD COLUMN `modificadoEn` INTEGER")
+    }
+}

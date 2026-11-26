@@ -9,6 +9,7 @@ import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.feature.contabilidad.data.ComprobanteRepository
 import com.contamovil.feature.contabilidad.data.CuentaRepository
 import com.contamovil.feature.contabilidad.data.FORMATO_FECHA
+import com.contamovil.feature.contabilidad.data.centavosATexto
 import com.contamovil.feature.contabilidad.data.formatCentavos
 import com.contamovil.feature.contabilidad.data.parseCentavos
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +39,10 @@ data class FormState(
     val fecha: String,
     val concepto: String,
     val lineas: List<LineaForm>,
-    val error: String? = null
+    val error: String? = null,
+    /** Id del comprobante que se está editando; null si es uno nuevo. */
+    val editandoId: Long? = null,
+    val numero: Int? = null
 ) {
     val totalDebito: Long get() = lineas.sumOf { parseCentavos(it.debito) ?: 0L }
     val totalCredito: Long get() = lineas.sumOf { parseCentavos(it.credito) ?: 0L }
@@ -75,6 +79,32 @@ class ComprobantesViewModel @Inject constructor(
     fun nuevo() {
         siguienteId = 3
         _form.value = FormState.nuevo()
+    }
+
+    /** Carga un comprobante existente en el formulario. [onListo] se llama cuando ya se puede mostrar. */
+    fun editar(comprobante: ComprobanteResumen, onListo: () -> Unit) {
+        viewModelScope.launch {
+            val e = repo.cargarParaEditar(comprobante.id) ?: return@launch
+            val lineas = e.lineas.mapIndexed { i, l ->
+                LineaForm(
+                    id = i + 1,
+                    cuenta = l.cuenta,
+                    debito = if (l.debito > 0) centavosATexto(l.debito) else "",
+                    credito = if (l.credito > 0) centavosATexto(l.credito) else "",
+                    descripcion = l.descripcion
+                )
+            }.toMutableList()
+            while (lineas.size < 2) lineas.add(LineaForm(lineas.size + 1))
+            siguienteId = lineas.size + 1
+            _form.value = FormState(
+                fecha = LocalDate.ofEpochDay(e.fecha).format(FORMATO_FECHA),
+                concepto = e.concepto,
+                lineas = lineas,
+                editandoId = comprobante.id,
+                numero = e.numero
+            )
+            onListo()
+        }
     }
 
     fun setFecha(v: String) = _form.update { it.copy(fecha = v, error = null) }
@@ -152,7 +182,12 @@ class ComprobantesViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            repo.crear(fecha.toEpochDay(), f.concepto.trim(), asientos)
+            val id = f.editandoId
+            if (id == null) {
+                repo.crear(fecha.toEpochDay(), f.concepto.trim(), asientos)
+            } else {
+                repo.actualizar(id, fecha.toEpochDay(), f.concepto.trim(), asientos)
+            }
             onExito()
         }
     }
