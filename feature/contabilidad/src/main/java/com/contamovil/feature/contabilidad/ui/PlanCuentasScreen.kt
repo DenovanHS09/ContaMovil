@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -26,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -42,7 +45,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.core.database.entity.TipoCuenta
 import com.contamovil.feature.contabilidad.data.sugerirMadre
-import com.contamovil.feature.contabilidad.data.VarianteNomenclador
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,9 +60,11 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Plan de cuentas") },
+                title = { Text("Cuentas") },
                 actions = {
-                    TextButton(onClick = { mostrarNomenclador = true }) { Text("Nomenclador") }
+                    TextButton(onClick = { mostrarNomenclador = true }) {
+                        Text("Nomenclador")
+                    }
                 }
             )
         },
@@ -70,24 +74,108 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
             }
         }
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Text(
+                        "Estructura contable",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Text(
+                        "Consulta, organiza y administra las cuentas de tu entidad.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.86f)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.12f),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Column(Modifier.padding(horizontal = 14.dp, vertical = 8.dp)) {
+                                Text(
+                                    todas.size.toString(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                                Text(
+                                    "Cuentas",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                        }
+                        Surface(
+                            color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.12f),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Column(Modifier.padding(horizontal = 14.dp, vertical = 8.dp)) {
+                                Text(
+                                    todas.count { it.cuentaPadreId == null }.toString(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                                Text(
+                                    "Principales",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             OutlinedTextField(
                 value = busqueda,
                 onValueChange = vm::setBusqueda,
                 label = { Text("Buscar por código o nombre") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             )
 
             val lista = filas
             when {
                 lista == null -> Unit
-                lista.isEmpty() && busqueda.isBlank() -> Text(
-                    "Aún no hay cuentas. Toca \"Nomenclador\" arriba para cargar el nomenclador cubano, o + para crear una.",
-                    modifier = Modifier.padding(16.dp)
+                lista.isEmpty() && busqueda.isBlank() -> {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Todavía no hay cuentas", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                "Carga el nomenclador cubano desde el botón superior o crea una cuenta con el botón +.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+                lista.isEmpty() -> Text(
+                    "No encontramos cuentas que coincidan con la búsqueda.",
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                lista.isEmpty() -> Text("Sin resultados.", modifier = Modifier.padding(16.dp))
-                else -> LazyColumn(Modifier.fillMaxSize()) {
+                else -> LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        start = 12.dp, end = 12.dp, top = 2.dp, bottom = 88.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                     items(lista, key = { it.cuenta.id }) { fila ->
                         FilaCuentaItem(
                             fila = fila,
@@ -137,7 +225,7 @@ fun PlanCuentasScreen(vm: PlanCuentasViewModel = hiltViewModel()) {
     }
 }
 
-/** Fila ligera del árbol: "+" cerrada, "−" abierta, "•" sin subcuentas. */
+/** Tarjeta de cuenta dentro del árbol jerárquico. */
 @Composable
 private fun FilaCuentaItem(
     fila: FilaCuenta,
@@ -145,33 +233,72 @@ private fun FilaCuentaItem(
     onAlternar: () -> Unit,
     onEliminar: () -> Unit
 ) {
-    val c = fila.cuenta
-    val sangria = if (enBusqueda) 0 else (c.nivel - 1) * 16
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .clickable(enabled = fila.tieneHijas, onClick = onAlternar)
-            .padding(start = (12 + sangria).dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
+    val cuenta = fila.cuenta
+    val sangria = if (enBusqueda) 0 else ((cuenta.nivel - 1).coerceAtLeast(0) * 12)
+
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(start = sangria.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (cuenta.nivel <= 1) MaterialTheme.colorScheme.surface
+            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Text(
-            when {
-                !fila.tieneHijas -> "•"
-                fila.expandida -> "−"
-                else -> "+"
-            },
-            modifier = Modifier.width(24.dp),
-            style = MaterialTheme.typography.titleMedium
-        )
-        Column(Modifier.weight(1f)) {
-            Text("${c.codigo}  ${c.nombre}", style = MaterialTheme.typography.bodyMedium)
-            Text(
-                "${c.tipo.name.lowercase()} · ${c.naturaleza.name.lowercase()}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        IconButton(onClick = onEliminar) {
-            Icon(Icons.Default.Delete, contentDescription = "Borrar cuenta")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.padding(start = 10.dp).clickable(
+                    enabled = fila.tieneHijas,
+                    onClick = onAlternar
+                ),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    when {
+                        !fila.tieneHijas -> "•"
+                        fila.expandida -> "−"
+                        else -> "+"
+                    },
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f).clickable(
+                    enabled = fila.tieneHijas,
+                    onClick = onAlternar
+                ).padding(horizontal = 10.dp, vertical = 11.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Text(
+                    cuenta.nombre,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        cuenta.codigo,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        "  ·  ${cuenta.tipo.name.lowercase()}  ·  ${cuenta.naturaleza.name.lowercase()}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            IconButton(onClick = onEliminar) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Borrar cuenta",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
