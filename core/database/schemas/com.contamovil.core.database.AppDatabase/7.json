@@ -1,0 +1,701 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 7,
+    "identityHash": "47e8e9926842efde00323076d55bf44c",
+    "entities": [
+      {
+        "tableName": "cuentas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `codigo` TEXT NOT NULL, `nombre` TEXT NOT NULL, `tipo` TEXT NOT NULL, `naturaleza` TEXT NOT NULL, `nivel` INTEGER NOT NULL, `cuentaPadreId` INTEGER, `aceptaMovimientos` INTEGER NOT NULL DEFAULT 1, `activa` INTEGER NOT NULL DEFAULT 1, `codigoHasta` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "codigo",
+            "columnName": "codigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "naturaleza",
+            "columnName": "naturaleza",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nivel",
+            "columnName": "nivel",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuentaPadreId",
+            "columnName": "cuentaPadreId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "aceptaMovimientos",
+            "columnName": "aceptaMovimientos",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "activa",
+            "columnName": "activa",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "codigoHasta",
+            "columnName": "codigoHasta",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_cuentas_codigo",
+            "unique": true,
+            "columnNames": [
+              "codigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_cuentas_codigo` ON `${TABLE_NAME}` (`codigo`)"
+          },
+          {
+            "name": "index_cuentas_cuentaPadreId",
+            "unique": false,
+            "columnNames": [
+              "cuentaPadreId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cuentas_cuentaPadreId` ON `${TABLE_NAME}` (`cuentaPadreId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "comprobantes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `numero` INTEGER NOT NULL, `fecha` INTEGER NOT NULL, `concepto` TEXT NOT NULL, `creadoEn` INTEGER NOT NULL, `modificadoEn` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numero",
+            "columnName": "numero",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "concepto",
+            "columnName": "concepto",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creadoEn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modificadoEn",
+            "columnName": "modificadoEn",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_comprobantes_numero",
+            "unique": true,
+            "columnNames": [
+              "numero"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_comprobantes_numero` ON `${TABLE_NAME}` (`numero`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "asientos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `comprobanteId` INTEGER NOT NULL, `cuentaId` INTEGER NOT NULL, `debito` INTEGER NOT NULL, `credito` INTEGER NOT NULL, `descripcion` TEXT NOT NULL, FOREIGN KEY(`comprobanteId`) REFERENCES `comprobantes`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`cuentaId`) REFERENCES `cuentas`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comprobanteId",
+            "columnName": "comprobanteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuentaId",
+            "columnName": "cuentaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "debito",
+            "columnName": "debito",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "credito",
+            "columnName": "credito",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descripcion",
+            "columnName": "descripcion",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_asientos_comprobanteId",
+            "unique": false,
+            "columnNames": [
+              "comprobanteId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_asientos_comprobanteId` ON `${TABLE_NAME}` (`comprobanteId`)"
+          },
+          {
+            "name": "index_asientos_cuentaId",
+            "unique": false,
+            "columnNames": [
+              "cuentaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_asientos_cuentaId` ON `${TABLE_NAME}` (`cuentaId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "comprobantes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "comprobanteId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "cuentas",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "cuentaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "normas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `codigo` TEXT NOT NULL, `numero` INTEGER NOT NULL, `anio` INTEGER NOT NULL, `organismo` TEXT NOT NULL, `titulo` TEXT NOT NULL, `gaceta` TEXT NOT NULL, `identificador` TEXT, `fechaFirma` TEXT, `fechaPublicacion` TEXT, `fechaVigencia` TEXT, `instrumento` TEXT NOT NULL, `estado` TEXT NOT NULL, `derogadaPorCodigo` TEXT, `verificacion` TEXT NOT NULL, `observaciones` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "codigo",
+            "columnName": "codigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numero",
+            "columnName": "numero",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anio",
+            "columnName": "anio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "organismo",
+            "columnName": "organismo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gaceta",
+            "columnName": "gaceta",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "identificador",
+            "columnName": "identificador",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fechaFirma",
+            "columnName": "fechaFirma",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fechaPublicacion",
+            "columnName": "fechaPublicacion",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fechaVigencia",
+            "columnName": "fechaVigencia",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "instrumento",
+            "columnName": "instrumento",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "derogadaPorCodigo",
+            "columnName": "derogadaPorCodigo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "verificacion",
+            "columnName": "verificacion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_normas_codigo",
+            "unique": true,
+            "columnNames": [
+              "codigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_normas_codigo` ON `${TABLE_NAME}` (`codigo`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "cuenta_versiones",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cuentaCodigo` TEXT NOT NULL, `variante` TEXT, `denominacion` TEXT NOT NULL, `naturaleza` TEXT NOT NULL, `grupo` TEXT NOT NULL, `subgrupo` TEXT NOT NULL, `usoContenido` TEXT, `funcionamientoDebitos` TEXT, `funcionamientoCreditos` TEXT, `normaOrigenCodigo` TEXT NOT NULL, `vigenteDesde` TEXT, `vigenteHasta` TEXT, `estadoNormativo` TEXT NOT NULL, `observaciones` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuentaCodigo",
+            "columnName": "cuentaCodigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "variante",
+            "columnName": "variante",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "denominacion",
+            "columnName": "denominacion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "naturaleza",
+            "columnName": "naturaleza",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "grupo",
+            "columnName": "grupo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subgrupo",
+            "columnName": "subgrupo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usoContenido",
+            "columnName": "usoContenido",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "funcionamientoDebitos",
+            "columnName": "funcionamientoDebitos",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "funcionamientoCreditos",
+            "columnName": "funcionamientoCreditos",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "normaOrigenCodigo",
+            "columnName": "normaOrigenCodigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vigenteDesde",
+            "columnName": "vigenteDesde",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vigenteHasta",
+            "columnName": "vigenteHasta",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "estadoNormativo",
+            "columnName": "estadoNormativo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_cuenta_versiones_cuentaCodigo",
+            "unique": false,
+            "columnNames": [
+              "cuentaCodigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cuenta_versiones_cuentaCodigo` ON `${TABLE_NAME}` (`cuentaCodigo`)"
+          },
+          {
+            "name": "index_cuenta_versiones_normaOrigenCodigo",
+            "unique": false,
+            "columnNames": [
+              "normaOrigenCodigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cuenta_versiones_normaOrigenCodigo` ON `${TABLE_NAME}` (`normaOrigenCodigo`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "cambios_normativos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cuentaCodigo` TEXT NOT NULL, `normaCodigo` TEXT NOT NULL, `tipoCambio` TEXT NOT NULL, `valorAnterior` TEXT, `valorNuevo` TEXT, `estado` TEXT NOT NULL, `observaciones` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuentaCodigo",
+            "columnName": "cuentaCodigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normaCodigo",
+            "columnName": "normaCodigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipoCambio",
+            "columnName": "tipoCambio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valorAnterior",
+            "columnName": "valorAnterior",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "valorNuevo",
+            "columnName": "valorNuevo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_cambios_normativos_cuentaCodigo",
+            "unique": false,
+            "columnNames": [
+              "cuentaCodigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cambios_normativos_cuentaCodigo` ON `${TABLE_NAME}` (`cuentaCodigo`)"
+          },
+          {
+            "name": "index_cambios_normativos_normaCodigo",
+            "unique": false,
+            "columnNames": [
+              "normaCodigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cambios_normativos_normaCodigo` ON `${TABLE_NAME}` (`normaCodigo`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "perfil_entidad",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `tipoEntidad` TEXT NOT NULL, `actualizadoEn` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipoEntidad",
+            "columnName": "tipoEntidad",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizadoEn",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "normas_revisiones",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `clave` TEXT NOT NULL, `tabla` TEXT NOT NULL, `registro` TEXT NOT NULL, `campo` TEXT NOT NULL, `valorAnterior` TEXT, `valorNuevo` TEXT, `motivo` TEXT NOT NULL, `fuente` TEXT NOT NULL, `aplicadoEn` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clave",
+            "columnName": "clave",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tabla",
+            "columnName": "tabla",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "registro",
+            "columnName": "registro",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "campo",
+            "columnName": "campo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valorAnterior",
+            "columnName": "valorAnterior",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "valorNuevo",
+            "columnName": "valorNuevo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "motivo",
+            "columnName": "motivo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fuente",
+            "columnName": "fuente",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aplicadoEn",
+            "columnName": "aplicadoEn",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_normas_revisiones_clave",
+            "unique": true,
+            "columnNames": [
+              "clave"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_normas_revisiones_clave` ON `${TABLE_NAME}` (`clave`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '47e8e9926842efde00323076d55bf44c')"
+    ]
+  }
+}
