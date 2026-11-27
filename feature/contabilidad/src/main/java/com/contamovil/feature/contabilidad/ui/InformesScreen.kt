@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,12 +36,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contamovil.feature.contabilidad.data.FORMATO_FECHA
 import com.contamovil.feature.contabilidad.data.formatCentavos
 import com.contamovil.feature.contabilidad.data.formatSaldo
+import com.contamovil.feature.contabilidad.data.nombreNivel
 import java.time.LocalDate
 
 private fun fechaCorta(epochDia: Long): String =
     LocalDate.ofEpochDay(epochDia).format(FORMATO_FECHA)
 
-/** Informes: libro diario, libro mayor y balance de comprobación (CUP). */
+/** Informes: libro diario, libro mayor, balance de comprobación y saldos por niveles (CUP). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InformesScreen(vm: InformesViewModel = hiltViewModel()) {
@@ -61,7 +63,7 @@ fun InformesScreen(vm: InformesViewModel = hiltViewModel()) {
                 Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                listOf("Diario", "Mayor", "Balance").forEachIndexed { i, titulo ->
+                listOf("Diario", "Mayor", "Balance", "Saldos").forEachIndexed { i, titulo ->
                     FilterChip(
                         selected = vista == i,
                         onClick = { vista = i },
@@ -89,7 +91,8 @@ fun InformesScreen(vm: InformesViewModel = hiltViewModel()) {
             when (vista) {
                 0 -> DiarioVista(vm)
                 1 -> MayorVista(vm)
-                else -> BalanceVista(vm)
+                2 -> BalanceVista(vm)
+                else -> SaldosVista(vm)
             }
         }
     }
@@ -234,6 +237,88 @@ private fun BalanceVista(vm: InformesViewModel) {
                             color = MaterialTheme.colorScheme.error
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+/** Saldos acumulados hacia arriba: cada grupo, subgrupo y cuenta suma los de todo lo que contiene. */
+@Composable
+private fun SaldosVista(vm: InformesViewModel) {
+    val datos by vm.saldos.collectAsStateWithLifecycle()
+    var nivel by rememberSaveable { mutableIntStateOf(2) }
+    var ocultarVacias by rememberSaveable { mutableStateOf(true) }
+
+    val d = datos
+    if (d == null) {
+        Text("Pulsa Consultar para calcular los saldos.")
+        return
+    }
+    if (d.nodos.isEmpty()) {
+        Text("El plan de cuentas está vacío.")
+        return
+    }
+
+    Row(
+        Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        for (n in 1..minOf(d.nivelMaximo, 6)) {
+            FilterChip(selected = nivel == n, onClick = { nivel = n }, label = { Text(nombreNivel(n)) })
+        }
+        FilterChip(
+            selected = ocultarVacias,
+            onClick = { ocultarVacias = !ocultarVacias },
+            label = { Text("Solo con saldo o movimiento") }
+        )
+    }
+
+    val visibles = d.nodos.filter { it.nivel <= nivel && !(ocultarVacias && it.sinMovimiento) }
+    if (visibles.isEmpty()) {
+        Text("No hay cuentas con saldo o movimiento hasta ese nivel en el período.")
+    }
+
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        items(visibles, key = { it.id }) { n ->
+            Column(Modifier.fillMaxWidth().padding(start = ((n.nivel - 1) * 12).dp, top = 4.dp, bottom = 2.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "${n.codigo} ${n.nombre}",
+                        modifier = Modifier.weight(1f),
+                        style = if (n.nivel <= 2) MaterialTheme.typography.titleSmall
+                        else MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (n.nivel <= 2) FontWeight.Bold else FontWeight.Normal
+                    )
+                    Text(formatSaldo(n.saldoFinal), fontWeight = FontWeight.Medium)
+                }
+                Text(
+                    "Inicial ${formatSaldo(n.saldoInicial)} · Débitos ${formatCentavos(n.debitos)} · " +
+                        "Créditos ${formatCentavos(n.creditos)}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                if (n.saldoContrario) {
+                    Text(
+                        "⚠ Saldo contrario a la naturaleza de la cuenta",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                HorizontalDivider(Modifier.padding(top = 4.dp))
+            }
+        }
+        item {
+            Column(Modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("Débitos del período: ${formatCentavos(d.totalDebitos)} CUP")
+                Text("Créditos del período: ${formatCentavos(d.totalCreditos)} CUP")
+                if (d.cuadra) {
+                    Text("Control: la suma de los saldos de los grupos es 0.00 ✓")
+                } else {
+                    Text(
+                        "Control: la suma de los saldos de los grupos es ${formatSaldo(d.sumaSaldos)}" +
+                            if (d.sinUbicar > 0) " y hay ${d.sinUbicar} cuentas fuera del plan" else "",
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }

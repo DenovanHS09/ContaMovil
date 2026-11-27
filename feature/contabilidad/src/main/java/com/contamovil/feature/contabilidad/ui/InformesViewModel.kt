@@ -9,6 +9,7 @@ import com.contamovil.core.database.entity.CuentaEntity
 import com.contamovil.feature.contabilidad.data.CuentaRepository
 import com.contamovil.feature.contabilidad.data.FORMATO_FECHA
 import com.contamovil.feature.contabilidad.data.InformeRepository
+import com.contamovil.feature.contabilidad.data.SaldosPorNiveles
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,6 +57,9 @@ class InformesViewModel @Inject constructor(
     private val _balance = MutableStateFlow<List<FilaBalance>>(emptyList())
     val balance: StateFlow<List<FilaBalance>> = _balance
 
+    private val _saldos = MutableStateFlow<SaldosPorNiveles?>(null)
+    val saldos: StateFlow<SaldosPorNiveles?> = _saldos
+
     private val _cuentaMayor = MutableStateFlow<CuentaEntity?>(null)
     val cuentaMayor: StateFlow<CuentaEntity?> = _cuentaMayor
 
@@ -73,7 +77,7 @@ class InformesViewModel @Inject constructor(
         null
     }
 
-    /** Recalcula el informe de la vista indicada: 0 = diario, 1 = mayor, 2 = balance. */
+    /** Recalcula el informe de la vista indicada: 0 = diario, 1 = mayor, 2 = balance, 3 = saldos por niveles. */
     fun actualizar(vista: Int) {
         val d = parseFecha(_desde.value)
         val h = parseFecha(_hasta.value)
@@ -94,7 +98,8 @@ class InformesViewModel @Inject constructor(
                     val cuenta = _cuentaMayor.value
                     _mayor.value = if (cuenta == null) null else construirMayor(cuenta.id, d, h)
                 }
-                else -> _balance.value = repo.balance(d, h)
+                2 -> _balance.value = repo.balance(d, h)
+                else -> _saldos.value = repo.saldosPorNiveles(d, h)
             }
         }
     }
