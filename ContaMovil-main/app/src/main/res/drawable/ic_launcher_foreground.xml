@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Hoja del libro contable -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,28h36a4,4 0 0 1 4,4v44a4,4 0 0 1 -4,4h-36a4,4 0 0 1 -4,-4v-44a4,4 0 0 1 4,-4z" />
+
+    <!-- Líneas de asientos -->
+    <path
+        android:fillColor="#0F766E"
+        android:pathData="M40,38h28v4h-28z" />
+    <path
+        android:fillColor="#0F766E"
+        android:pathData="M40,48h28v4h-28z" />
+    <path
+        android:fillColor="#0F766E"
+        android:pathData="M40,58h16v4h-16z" />
+
+    <!-- Moneda -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M66,61a7,7 0 1 1 0,14a7,7 0 1 1 0,-14z" />
+</vector>
