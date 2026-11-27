@@ -71,7 +71,7 @@ El APK queda en `app/build/outputs/apk/debug/`. También puedes dejar que **GitH
 - [x] Libro diario, mayor y balance de comprobación
 - [x] Respaldo y restauración de datos
 - [x] Editar comprobantes existentes
-- [ ] Saldos acumulados por subgrupo y grupo
+- [x] Saldos acumulados por subgrupo y grupo
 - [ ] Exportar informes a PDF y Excel
 - [ ] Cifrado de la base de datos
 - [ ] Acceso con huella o PIN
