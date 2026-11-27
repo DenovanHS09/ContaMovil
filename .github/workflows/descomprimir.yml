@@ -85,10 +85,20 @@ jobs:
               )
 
           for item in source.iterdir():
+              destination = root / item.name
+
               if item.name in (".git", "_contamovil_staging"):
                   continue
 
-              destination = root / item.name
+              if item.name == ".github":
+                  if item.is_dir():
+                      shutil.copytree(
+                          item,
+                          destination,
+                          dirs_exist_ok=True,
+                          ignore=shutil.ignore_patterns("workflows")
+                      )
+                  continue
 
               if item.is_dir():
                   shutil.copytree(
@@ -100,6 +110,7 @@ jobs:
                   shutil.copy2(item, destination)
 
           print("Proyecto extraido correctamente.")
+          print("Los workflows existentes se han conservado.")
           print(f"Origen detectado: {source}")
           PY
 
@@ -163,3 +174,4 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
+          
