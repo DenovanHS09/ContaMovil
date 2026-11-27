@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       archivo:
-        description: "Nombre del ZIP que se subio a la raiz del repositorio"
+        description: "Nombre del ZIP subido a la raiz del repositorio"
         required: true
         default: "contamovil-update.zip"
 
@@ -43,10 +43,11 @@ jobs:
           staging = root / "_contamovil_staging"
 
           if root not in archive.parents or not archive.is_file():
-              raise SystemExit("ERROR: No se encontro el ZIP en la raiz del repositorio.")
+              raise SystemExit("ERROR: No se encontro el ZIP.")
 
           if staging.exists():
               shutil.rmtree(staging)
+
           staging.mkdir()
 
           with zipfile.ZipFile(archive, "r") as z:
@@ -55,7 +56,7 @@ jobs:
                   path = PurePosixPath(name)
 
                   if path.is_absolute() or ".." in path.parts:
-                      raise SystemExit(f"Ruta no permitida en ZIP: {name}")
+                      raise SystemExit(f"Ruta no permitida: {name}")
 
                   mode = info.external_attr >> 16
                   if (mode & 0o170000) == 0o120000:
@@ -73,10 +74,15 @@ jobs:
 
           if len(candidates) == 1:
               source = candidates[0]
-          elif (staging / "settings.gradle.kts").is_file() or (staging / "settings.gradle").is_file():
+          elif (
+              (staging / "settings.gradle.kts").is_file()
+              or (staging / "settings.gradle").is_file()
+          ):
               source = staging
           else:
-              raise SystemExit("ERROR: No se encontro un proyecto Gradle valido en el ZIP.")
+              raise SystemExit(
+                  "ERROR: No se encontro un proyecto Gradle valido."
+              )
 
           for item in source.iterdir():
               if item.name in (".git", "_contamovil_staging"):
@@ -85,7 +91,11 @@ jobs:
               destination = root / item.name
 
               if item.is_dir():
-                  shutil.copytree(item, destination, dirs_exist_ok=True)
+                  shutil.copytree(
+                      item,
+                      destination,
+                      dirs_exist_ok=True
+                  )
               else:
                   shutil.copy2(item, destination)
 
@@ -100,7 +110,19 @@ jobs:
           java-version: "17"
 
       - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          accept-android-sdk-licenses: true
+
+      - name: Instalar Android SDK 35
+        run: |
+          set -e
+          yes | sdkmanager --licenses || true
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Configurar Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
@@ -141,4 +163,3 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
-          
